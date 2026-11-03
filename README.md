@@ -66,7 +66,8 @@ as a stem it conjugates (罵 and the endings of its kind: 罵れば, nonoshireba
 showed), and the costs of word classes following one another. It cuts each run into its cheapest
 sequence of words (Viterbi), spaces them as [cutlet](https://github.com/polm/cutlet) does, then
 writes them in revised Hepburn. A number in digits stays in digits, read with its counter (17歳,
-17 sai), or as the word it makes (2人, futari; 20歳, hatachi).
+17 sai), or as the word it makes (2人, futari; 20歳, hatachi). A word spelled out kana by kana is
+read whole and written kana by kana: は・や・く is ha ya ku, its は no particle.
 
 The words and the costs come from subtitles (3.2 million lines) and, weighted a hundredfold, from
 the lyrics of 230 songs, for the words songs use and subtitles do not. On the lyrics of 66 other

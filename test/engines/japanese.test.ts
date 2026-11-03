@@ -72,6 +72,12 @@ describe('japanese', () => {
     expect(japanese.romanize('行いを正す')).toBe('okonai o tadasu');
   });
 
+  it('reads a word spelled out kana by kana whole, and writes it kana by kana', () => {
+    expect(japanese.romanize('は・や・く')).toBe('ha ya ku');
+    expect(japanese.romanize('へ い わ')).toBe('he i wa');
+    expect(japanese.romanize('わ・た・し・は')).toBe('wa ta shi wa');
+  });
+
   it('reads a katakana word no entry has as it is written', () => {
     expect(japanese.romanize('ズッキュンドッキュン')).toBe('zukkyundokkyun');
   });

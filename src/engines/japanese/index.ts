@@ -1,5 +1,6 @@
 import type { Romanizer } from '../../domain/romanizer';
 import { tokenize } from './lattice';
+import { romanizeSpelled } from './spelled';
 import { romanizeTokens } from './words';
 
 // A chorus comes back several times in a song, and the engine stays loaded between songs.
@@ -14,7 +15,8 @@ export const japanese: Romanizer = {
   romanize(run) {
     const cached = cache.get(run);
     if (cached !== undefined) return cached;
-    const latin = romanizeTokens(tokenize(run));
+    // A run with separators in it is a word spelled out kana by kana: no other comes so (runs.ts).
+    const latin = run.includes('・') || run.includes(' ') ? romanizeSpelled(run) : romanizeTokens(tokenize(run));
     if (cache.size >= CACHE_LIMIT) cache.clear();
     cache.set(run, latin);
     return latin;

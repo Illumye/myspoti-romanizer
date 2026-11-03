@@ -66,10 +66,37 @@ function isPhrase(run: ScriptRun | undefined): boolean {
   return run !== undefined && (run.script === 'kana' || run.script === 'han');
 }
 
+// A word spelled out kana by kana, a separator between each two and this many kana at least
+// (は・や・く): read as one run, so that its engine reads the word they spell. A name with a dot
+// between its words (ロミオ・ジュリエット) has more than a kana between two.
+const SPELLING_SEPARATORS = new Set(['・', ' ']);
+const MIN_SPELLED = 3;
+
+function isLoneKana(run: ScriptRun | undefined): boolean {
+  return run?.script === 'kana' && run.text.length === 1;
+}
+
+function isSpellingSeparator(run: ScriptRun | undefined): boolean {
+  return run !== undefined && SPELLING_SEPARATORS.has(run.text);
+}
+
+/** How many of [runs] from [from] spell a word out kana by kana (は, ・, や, ・, く), or 0. */
+function spelledFrom(runs: readonly ScriptRun[], from: number): number {
+  if (!isLoneKana(runs[from]) || isPhrase(runs[from - 1])) return 0;
+  let end = from + 1;
+  let kana = 1;
+  while (isSpellingSeparator(runs[end]) && isLoneKana(runs[end + 1])) {
+    end += 2;
+    kana++;
+  }
+  return kana >= MIN_SPELLED && !isPhrase(runs[end]) ? end - from : 0;
+}
+
 /**
  * [runs] as they are read in a song of [languages]. Kana and Han side by side are one phrase,
  * Japanese when it holds kana or the song is Japanese, Chinese otherwise. Digits that touch a
- * phrase are read with it, as a number is said with its counter (20歳, あと3秒).
+ * phrase are read with it, as a number is said with its counter (20歳, あと3秒), and a word spelled
+ * out kana by kana is one Japanese run, its separators in it (は・や・く).
  */
 export function languageRuns(runs: readonly ScriptRun[], languages: SongLanguages): LanguageRun[] {
   const out: LanguageRun[] = [];
@@ -77,6 +104,18 @@ export function languageRuns(runs: readonly ScriptRun[], languages: SongLanguage
   for (let i = 0; i < runs.length; i++) {
     const run = runs[i];
     if (run === undefined) break;
+    const spelled = phrase === undefined ? spelledFrom(runs, i) : 0;
+    if (spelled > 0) {
+      out.push({
+        language: 'ja',
+        text: runs
+          .slice(i, i + spelled)
+          .map((r) => r.text)
+          .join(''),
+      });
+      i += spelled - 1;
+      continue;
+    }
     if (isPhrase(run) || (run.script === 'digit' && (phrase !== undefined || isPhrase(runs[i + 1])))) {
       phrase = { text: (phrase?.text ?? '') + run.text, kana: (phrase?.kana ?? false) || run.script === 'kana' };
       continue;

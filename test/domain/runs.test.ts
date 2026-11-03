@@ -50,6 +50,26 @@ describe('languageRuns', () => {
     ]);
   });
 
+  it('reads a word spelled out kana by kana as one run, and a name with a dot as two', () => {
+    expect(languageRuns(scriptRuns('は・や・く'), japanese)).toEqual([{ language: 'ja', text: 'は・や・く' }]);
+    expect(languageRuns(scriptRuns('は や く!'), chinese)).toEqual([
+      { language: 'ja', text: 'は や く' },
+      { language: null, text: '!' },
+    ]);
+    expect(languageRuns(scriptRuns('ロミオ・ジュリエット'), japanese)).toEqual([
+      { language: 'ja', text: 'ロミオ' },
+      { language: null, text: '・' },
+      { language: 'ja', text: 'ジュリエット' },
+    ]);
+    expect(languageRuns(scriptRuns('君は・や・く'), japanese)).toEqual([
+      { language: 'ja', text: '君は' },
+      { language: null, text: '・' },
+      { language: 'ja', text: 'や' },
+      { language: null, text: '・' },
+      { language: 'ja', text: 'く' },
+    ]);
+  });
+
   it('keeps neutral text apart and marks the letters no engine reads', () => {
     expect(languageRuns(scriptRuns('Ἀθήνα, Москва'), japanese)).toEqual([
       { language: 'other', text: 'Ἀθήνα' },

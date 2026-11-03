@@ -1,6 +1,6 @@
 {
   "name": "myspoti-romanizer",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "A Myspoti extension that romanizes lyrics written in Japanese, Korean and Cyrillic scripts, offline.",
   "license": "GPL-3.0-or-later",

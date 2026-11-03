@@ -1,5 +1,5 @@
 import { MAX_SURFACE, NUMERAL, UNKNOWN } from './data/model.generated';
-import { coded, transition, wordsAt, type Word } from './lexicon';
+import { coded, conjugatedAt, transition, wordsAt, type Word } from './lexicon';
 
 /** A word of a run, as the cheapest reading of the run cuts it. */
 export interface Token {
@@ -73,7 +73,7 @@ export function tokenize(run: string): Token[] | null {
   for (let i = 0; i < run.length; i++) {
     const before = ending[i] ?? [];
     if (before.length === 0) continue;
-    const known = wordsAt(key, i, MAX_SURFACE);
+    const known = wordsAt(key, i, MAX_SURFACE).concat(conjugatedAt(key, i));
     for (const word of known.concat(unknownWords(run, i, known))) {
       const node: Node = { start: i, word, best: Infinity, previous: undefined };
       for (const previous of before) {

@@ -32,6 +32,23 @@ def reading_code(reading: str) -> str | None:
     return "".join(_KANA_CODE[ch] for ch in reading)
 
 
+# What a form adds to its stem's cost may be less than nothing (a form more common than its class
+# is on average): it is written from this many hundredths of a nat below zero.
+ENDING_COST_OFFSET = 2000
+
+
+def conjugations_code(table: list[list[tuple[str, str, int, int]]]) -> str:
+    """Each kind's forms, `ending,reading` coded, the class in two digits and the cost in two, `|`
+    after each, a space between kinds: neither is a digit."""
+    kinds = []
+    for rows in table:
+        for _, _, _, cost in rows:
+            if not 0 <= cost + ENDING_COST_OFFSET < BASE**2:
+                raise SystemExit(f"an ending's cost of {cost} does not fit in two digits")
+        kinds.append("".join(f"{e},{r}{number(c, 2)}{number(cost + ENDING_COST_OFFSET, 2)}|" for e, r, c, cost in rows))
+    return " ".join(kinds)
+
+
 def surface_code(surface: str) -> str:
     return "".join(_HIRAGANA_CODE.get(ch) or _NUMBER_DIGIT.get(ch, ch) for ch in surface)
 
@@ -72,6 +89,22 @@ def write_model(path: str, model: dict) -> None:
         "",
         "/** What one digit of a word's cost is worth, in hundredths of a nat. */",
         f"export const COST_STEP = {model['cost_step']};",
+        "",
+        "/** Verbs and adjectives by coded stem: `stem,reading`, its kind of conjugation in two digits and cost in one, `|` after each. */",
+        f"export const STEMS = {json.dumps(model['stems'], ensure_ascii=False)};",
+        "",
+        f"export const MAX_STEM = {model['max_stem']};",
+        "",
+        "/** The first characters of the coded stems, in their order. */",
+        f"export const STEM_INDEX_CHARS = {json.dumps(model['stem_index_chars'], ensure_ascii=False)};",
+        "",
+        "/** Where the stems of each of them start in STEMS, three digits each. */",
+        f"export const STEM_INDEX_STARTS = {json.dumps(model['stem_index_starts'])};",
+        "",
+        "/** Per kind of conjugation, its forms: `ending,reading` coded, the class in two digits and the cost it adds to the stem's in two, from -ENDING_COST_OFFSET, `|` after each, a space between kinds. */",
+        f"export const CONJUGATIONS = {json.dumps(model['conjugations'])};",
+        "",
+        f"export const ENDING_COST_OFFSET = {ENDING_COST_OFFSET};",
         "",
         "/** A run of katakana no word covers: a common noun, at this cost. */",
         f"export const UNKNOWN = {{ cls: {model['unknown_class']}, cost: {model['unknown_cost']} }};",

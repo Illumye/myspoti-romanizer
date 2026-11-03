@@ -59,15 +59,18 @@ lyrics as good as Myspoti's own it may be the one shown, with the same text.
 ## Japanese
 
 The engine reads a line as MeCab reads it with UniDic, from a model distilled offline into the
-script: about 52,500 words with their readings and costs, and the costs of word classes following
-one another. It cuts each run into its cheapest sequence of words (Viterbi), spaces them as
-[cutlet](https://github.com/polm/cutlet) does, then writes them in revised Hepburn.
+script: about 47,400 words with their readings and costs, 4,300 verbs and adjectives kept once each
+as a stem it conjugates (罵 and the endings of its kind: 罵れば, nonoshireba, a form no subtitle
+showed), and the costs of word classes following one another. It cuts each run into its cheapest
+sequence of words (Viterbi), spaces them as [cutlet](https://github.com/polm/cutlet) does, then
+writes them in revised Hepburn. A number in digits stays in digits, read with its counter (17歳,
+17 sai), or as the word it makes (2人, futari; 20歳, hatachi).
 
 The words and the costs come from subtitles (3.2 million lines) and, weighted a hundredfold, from
 the lyrics of 230 songs, for the words songs use and subtitles do not. On the lyrics of 66 other
-songs, by other artists, it reads 98.5 % of the runs, 93.8 % exactly as MeCab does; most of the
+songs, by other artists, it reads 99.1 % of the runs, 94.5 % exactly as MeCab does; most of the
 others are the readings it corrects on purpose for songs (`tools/japanese/corrections.tsv`: 私
-watashi, 明日 ashita, お母さん okāsan, 二つ futatsu, 何 nani or nan by what follows).
+watashi, 明日 ashita, お母さん okāsan, 二つ futatsu, 三十路 misoji, 何 nani or nan by what follows).
 
 The model is rebuilt with Python, in `tools/japanese`. The corpus and the lyrics stay in
 `tools/japanese/data`, out of the repository: only word counts reach the model.

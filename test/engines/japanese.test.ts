@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { japanese } from '../../src/engines/japanese';
 import { tokenize } from '../../src/engines/japanese/lattice';
-import { coded, wordsAt } from '../../src/engines/japanese/lexicon';
+import { coded, conjugatedAt, wordsAt } from '../../src/engines/japanese/lexicon';
 
 describe('japanese', () => {
   // Revised Hepburn, as MeCab reads the line: particles as said (wa, e, o), long vowels with a
@@ -61,6 +61,17 @@ describe('japanese', () => {
     expect(japanese.romanize('人生は一度だけ')).toBe('jinsei wa ichido dake');
   });
 
+  it('conjugates a verb kept once, as its stem, into forms the corpus never showed', () => {
+    expect(japanese.romanize('友さえも罵れば')).toBe('tomo sae mo nonoshireba');
+    expect(japanese.romanize('姿を倣えばいい')).toBe('sugata o naraeba ii');
+    expect(japanese.romanize('風に煽られて')).toBe('kaze ni aorarete');
+  });
+
+  it('gives a verb only the forms it takes: 行く has 行っ, and 行い stays okonai', () => {
+    expect(japanese.romanize('行ってきます')).toBe('itte kimasu');
+    expect(japanese.romanize('行いを正す')).toBe('okonai o tadasu');
+  });
+
   it('reads a katakana word no entry has as it is written', () => {
     expect(japanese.romanize('ズッキュンドッキュン')).toBe('zukkyundokkyun');
   });
@@ -78,6 +89,18 @@ describe('tokenize', () => {
       ['愛し', 'アイシ'],
       ['てる', 'テル'],
     ]);
+  });
+});
+
+describe('conjugatedAt', () => {
+  it('gives the forms of a stem that the text goes on with, read as stem and ending', () => {
+    const forms = conjugatedAt(coded('罵れば'), 0);
+    expect(forms.some((form) => form.length === 2 && form.reading === 'ノノシレ')).toBe(true);
+    expect(forms.every((form) => form.length <= 3)).toBe(true);
+  });
+
+  it('gives nothing where no stem starts', () => {
+    expect(conjugatedAt(coded('ありがとう'), 0)).toEqual([]);
   });
 });
 

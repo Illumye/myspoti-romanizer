@@ -1,6 +1,7 @@
 """Builds the Japanese engine's model (src/engines/japanese/data/model.generated.ts) from the corpus
 statistics (stats.py) and the lyrics corrections (corrections.tsv): the words seen most, within a
-size budget, each with its reading, class and cost, and the cost of a class following another.
+size budget, each with its reading, class and cost, the verbs and adjectives once each as a stem
+the extension conjugates (inflections.py), and the cost of a class following another.
 
 Costs are negative log probabilities in hundredths of a nat: a word given its class, a class given
 the one before it. The extension finds the cheapest reading of a run with them (Viterbi).
@@ -17,7 +18,8 @@ from pathlib import Path
 
 from common import backoff, hepburn_reading
 from corrections import apply_corrections
-from encode import BASE, DIGITS, number, reading_code, surface_code, write_model
+from encode import BASE, DIGITS, conjugations_code, number, reading_code, surface_code, write_model
+from inflections import conjugations, ending_cost, has_kanji, words_of
 
 TRANSITION_STEP = 20  # one transition digit is 0.2 nat: 20 hundredths
 COST_STEP = 20  # and so is one cost digit: the same precision for words and transitions
@@ -60,6 +62,25 @@ def merge(stats: dict, lyrics: dict, weight: float) -> None:
     stats["transitions"] = [[a, b, n] for (a, b), n in transitions.items()]
     for key, n in lyrics["unknown"].items():
         stats["unknown"][key] = stats["unknown"].get(key, 0) + n * weight
+    inflections = collections.Counter({tuple(row[:-1]): row[-1] for row in stats.get("inflections", [])})
+    for *form, n in lyrics.get("inflections", []):
+        inflections[tuple(form)] += n * weight
+    stats["inflections"] = [[*form, n] for form, n in inflections.items()]
+
+
+def indexed(records: list[tuple[str, str]]) -> tuple[str, str, str]:
+    """[records] (coded surface, record) in the order the extension searches them, joined, with the
+    first character of each block of them and where that block starts, three digits each."""
+    records = sorted(records, key=lambda r: r[0].encode("utf-16-be"))
+    chars, starts, offset = [], [], 0
+    for coded, record in records:
+        if not chars or chars[-1] != coded[0]:
+            chars.append(coded[0])
+            starts.append(number(offset, 3))
+        offset += len(record)
+    if offset >= BASE**3:
+        raise SystemExit(f"{offset} characters of records, three digits reach {BASE**3}")
+    return "".join(record for _, record in records), "".join(chars), "".join(starts)
 
 
 def main() -> None:
@@ -108,9 +129,36 @@ def main() -> None:
 
     matrix = "".join(transition_digit(a, b) for a in range(size) for b in range(size))
 
-    # Words: the corrections applied, the forms seen most first, within the budget.
     entries = {(s, p, c): [n, origin] for s, p, c, n, origin in stats["entries"] if len(s) <= MAX_SURFACE}
     corrected = apply_corrections(str(CORRECTIONS), entries)
+
+    # Verbs and adjectives with a kanji in their stem, once each: the stem, its kind of conjugation
+    # and its cost; per kind, the endings with theirs. What they take of the budget, the words lack.
+    words = words_of(stats.get("inflections", []), {key: origin for key, (_, origin) in entries.items()})
+    kinds, seen = conjugations(words)
+    stems = {w: n for w, n in seen.items() if n >= args.min_count and has_kanji(w[0]) and len(w[0]) <= MAX_SURFACE}
+    total = sum(stems.values())
+    kind_ids = {kind: i for i, kind in enumerate(sorted({kind for _, _, kind in stems}))}
+    table, generated = [], set()
+    for kind in sorted(kind_ids, key=kind_ids.__getitem__):
+        rows = []
+        for key, (ending, reading, share) in sorted(kinds[kind].items()):
+            c, code = cls(key), reading_code(reading)
+            if c is not None and class_total[c] and code is not None:
+                rows.append((surface_code(ending), code, c, ending_cost(share, class_total[c], total)))
+        table.append(rows)
+    stem_records = []
+    for (stem, stem_reading, kind), n in stems.items():
+        generated.update((stem + e, stem_reading + r, key) for key, (e, r, _) in kinds[kind].items())
+        cost = min(BASE - 1, round(-math.log(n / total) * 100 / COST_STEP))
+        record = f"{surface_code(stem)},{reading_code(stem_reading)}{number(kind_ids[kind], 2)}{number(cost, 1)}|"
+        stem_records.append((surface_code(stem), record))
+    stem_text, stem_chars, stem_starts = indexed(stem_records)
+    conjugated = (stem_text, stem_chars, stem_starts, conjugations_code(table))
+    budget = args.budget - sum(len(part.encode("utf-8")) for part in conjugated)
+
+    # Words: the corrections applied, the forms seen most first, within the budget; the forms the
+    # stems give left out.
     records, used = [], 0
     for (surface, pron, key), (count, origin) in sorted(entries.items(), key=lambda kv: -kv[1][0]):
         if count < args.min_count:
@@ -119,25 +167,17 @@ def main() -> None:
         reading = reading_code(hepburn_reading(pron, origin))
         if c is None or not class_total[c] or reading is None or any(ord(ch) > 0xFFFF for ch in surface):
             continue
+        if (surface, hepburn_reading(pron, origin), key) in generated:
+            continue
         cost = min(BASE - 1, round(-math.log(min(1.0, count / class_total[c])) * 100 / COST_STEP))
         coded = surface_code(surface)
         record = f"{coded},{reading}{number(c, 2)}{number(cost, 1)}|"
-        if used + len(record.encode("utf-8")) > args.budget:
+        if used + len(record.encode("utf-8")) > budget:
             break
         records.append((coded, record))
         used += len(record.encode("utf-8"))
-    records.sort(key=lambda r: r[0].encode("utf-16-be"))
-    lexicon = "".join(record for _, record in records)
-
-    # Where the words of each first character start, so a search stays within their block.
-    index_chars, index_starts, offset = [], [], 0
-    for coded, record in records:
-        if not index_chars or index_chars[-1] != coded[0]:
-            index_chars.append(coded[0])
-            index_starts.append(number(offset, 3))
-        offset += len(record)
-    if offset >= BASE**3:
-        raise SystemExit(f"{offset} characters of lexicon, three digits reach {BASE**3}")
+    # Each block of a first character searched apart, so a search stays within it.
+    lexicon, index_chars, index_starts = indexed(records)
 
     unknown = cls(UNKNOWN_CLASS)
     share = (stats["unknown"].get(UNKNOWN_CLASS, 0) + 1) / (class_total[unknown] + 1)
@@ -151,8 +191,13 @@ def main() -> None:
         {
             "lexicon": lexicon,
             "max_surface": MAX_SURFACE,
-            "index_chars": "".join(index_chars),
-            "index_starts": "".join(index_starts),
+            "index_chars": index_chars,
+            "index_starts": index_starts,
+            "stems": stem_text,
+            "max_stem": max((len(stem) for stem, _, _ in stems), default=0),
+            "stem_index_chars": stem_chars,
+            "stem_index_starts": stem_starts,
+            "conjugations": conjugated[3],
             "flags": [flags_of(n) for n in names],
             "transitions": matrix,
             "transition_step": TRANSITION_STEP,
@@ -163,7 +208,10 @@ def main() -> None:
             "numeral_cost": numeral_cost,
         },
     )
-    print(f"{size} classes, {len(records)} words, {used / 1024:.0f} KB, {corrected} corrections")
+    print(
+        f"{size} classes, {len(records)} words, {used / 1024:.0f} KB, {corrected} corrections; "
+        f"{len(stems)} verbs and adjectives, {(args.budget - budget) / 1024:.0f} KB, {len(table)} kinds"
+    )
 
 
 if __name__ == "__main__":

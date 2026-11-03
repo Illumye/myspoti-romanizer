@@ -17,8 +17,10 @@ romanization. A romanization the lyrics' source gives (Apple Music, NetEase) alw
 | Serbian    | Serbian Latin alphabet                                                       |
 | Macedonian | Official system (2008)                                                       |
 
-A line is romanized whole or not at all: a line holding a script no engine reads, or a kanji the
-Japanese lexicon has no reading for, gets nothing rather than half a romanization. The language is
+What no engine reads stays as it is written in the romanized line: a kanji the Japanese lexicon has
+no reading for, a word in a script none romanizes (kimi to 龘 no uta). A line where that is more
+than a quarter of its letters gets no romanization: it would not help read it, and is likely in a
+language no engine reads (Chinese in a Japanese song). The language is
 decided for the whole song (a line of kanji alone is Japanese in a song with kana elsewhere), the
 lyrics' own language first when their source gives it.
 

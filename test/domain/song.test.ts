@@ -2,9 +2,10 @@ import { describe, expect, it } from 'vitest';
 import type { Engines, Romanizer } from '../../src/domain/romanizer';
 import { romanizeSong } from '../../src/domain/song';
 
-// Fake engines: the run in brackets, or nothing for the runs they are told not to know.
+// Fake engines: in Latin letters only, as a real one writes what it reads, their language and the
+// length of the run they were given; nothing for the runs they are told not to know.
 const fake = (tag: string, unknown = ''): Romanizer => ({
-  romanize: (run) => (unknown !== '' && run.includes(unknown) ? null : `${tag}(${run})`),
+  romanize: (run) => (unknown !== '' && run.includes(unknown) ? null : `${tag}(${String(run.length)})`),
 });
 const engines: Engines = { ja: fake('ja', '謎'), ko: fake('ko'), ru: fake('ru'), uk: fake('uk') };
 
@@ -14,30 +15,31 @@ describe('romanizeSong', () => {
   it('romanizes each line whole, by index, and leaves the others out', () => {
     expect(romanizeSong(song('Intro', '君を愛してる', '♪', '사랑해'), engines)).toEqual(
       new Map([
-        [1, 'ja(君を愛してる)'],
-        [3, 'ko(사랑해)'],
+        [1, 'ja(6)'],
+        [3, 'ko(3)'],
       ]),
     );
   });
 
   it('keeps Latin words and punctuation around the romanized ones', () => {
-    expect(romanizeSong(song('I love 君を!'), engines).get(0)).toBe('I love ja(君を)!');
+    expect(romanizeSong(song('I love 君を!'), engines).get(0)).toBe('I love ja(2)!');
   });
 
-  it('gives a line no romanization rather than half of one', () => {
+  it('keeps what no engine reads as it is written, unless that is more than a quarter of the line', () => {
+    expect(romanizeSong(song('君を愛してる Ἀθ'), engines, 'ja').get(0)).toBe('ja(6) Ἀθ');
     expect(romanizeSong(song('Ἀθήνα 君'), engines).size).toBe(0);
     expect(romanizeSong(song('君と謎'), engines).size).toBe(0);
     expect(romanizeSong(song('永远'), engines).size).toBe(0);
   });
 
   it('reads compatibility forms as their usual letters', () => {
-    expect(romanizeSong(song('ｶﾗｵｹ'), engines).get(0)).toBe('ja(カラオケ)');
-    expect(romanizeSong(song('２０歳'), engines, 'ja').get(0)).toBe('ja(20歳)');
+    expect(romanizeSong(song('ｶﾗｵｹ'), engines).get(0)).toBe('ja(4)');
+    expect(romanizeSong(song('２０歳'), engines, 'ja').get(0)).toBe('ja(3)');
   });
 
   it("reads the song's Cyrillic as the source says, else as its letters show", () => {
-    expect(romanizeSong(song('гора'), engines).get(0)).toBe('ru(гора)');
-    expect(romanizeSong(song('гора'), engines, 'uk').get(0)).toBe('uk(гора)');
-    expect(romanizeSong(song('гора', 'Київ'), engines).get(0)).toBe('uk(гора)');
+    expect(romanizeSong(song('гора'), engines).get(0)).toBe('ru(4)');
+    expect(romanizeSong(song('гора'), engines, 'uk').get(0)).toBe('uk(4)');
+    expect(romanizeSong(song('гора', 'Київ'), engines).get(0)).toBe('uk(4)');
   });
 });

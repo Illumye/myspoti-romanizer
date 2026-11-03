@@ -15,6 +15,7 @@ describe('assemble', () => {
     expect(assemble([latin('saranghae'), latin('aishiteru')])).toBe('saranghae aishiteru');
     expect(assemble([latin('kimi'), kept('!'), latin('boku')])).toBe('kimi! boku');
     expect(assemble([kept('('), latin('kimi'), kept(')')])).toBe('(kimi)');
+    expect(assemble([latin('kimi o aishiteru'), kept('Δ')])).toBe('kimi o aishiteru Δ');
   });
 
   it('keeps one space at most, none before closing punctuation', () => {

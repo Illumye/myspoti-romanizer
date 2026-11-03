@@ -14,8 +14,7 @@ export const japanese: Romanizer = {
   romanize(run) {
     const cached = cache.get(run);
     if (cached !== undefined) return cached;
-    const tokens = tokenize(run);
-    const latin = tokens === null ? null : romanizeTokens(tokens);
+    const latin = romanizeTokens(tokenize(run));
     if (cache.size >= CACHE_LIMIT) cache.clear();
     cache.set(run, latin);
     return latin;

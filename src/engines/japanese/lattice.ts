@@ -16,9 +16,12 @@ interface Node {
 }
 
 // What no word of the lexicon covers: a run of katakana is read as it is written (a loanword, a
-// name), a number in digits as a numeral, so that what follows reads as its counter (20歳, sai), a
-// lone kana at a high cost; a kanji has no reading to guess, and leaves the run unread.
+// name), a lone kana too at a high cost; a number in digits is a numeral, so that what follows reads
+// as its counter (20歳, sai), and is kept in digits. A kanji has no reading to guess: it is kept as
+// it is written, at a cost no reading comes near, so that the run is read around it, and so is a
+// kana words start at but no way through goes on from.
 const LONE_KANA_COST = 2000;
+const UNREAD_COST = 10_000;
 
 function isDigit(c: string): boolean {
   return c >= '0' && c <= '9';
@@ -47,23 +50,26 @@ function unknownWords(run: string, from: number, known: readonly Word[]): Word[]
   const c = run.charAt(from);
   if (isDigit(c)) {
     const end = spanEnd(run, from, isDigit);
-    return [{ length: end - from, reading: run.slice(from, end), cls: NUMERAL.cls, cost: NUMERAL.cost }];
+    return [{ length: end - from, reading: '', cls: NUMERAL.cls, cost: NUMERAL.cost }];
   }
   if (isKatakana(c)) {
     const end = spanEnd(run, from, isKatakana);
     return [{ length: end - from, reading: run.slice(from, end), cls: UNKNOWN.cls, cost: UNKNOWN.cost }];
   }
-  if (known.length === 0 && isKana(c)) {
-    return [{ length: 1, reading: toKatakana(c), cls: UNKNOWN.cls, cost: LONE_KANA_COST }];
+  if (isKana(c)) {
+    return [
+      { length: 1, reading: toKatakana(c), cls: UNKNOWN.cls, cost: known.length === 0 ? LONE_KANA_COST : UNREAD_COST },
+    ];
   }
-  return [];
+  return [{ length: 1, reading: '', cls: UNKNOWN.cls, cost: UNREAD_COST }];
 }
 
 /**
  * [run], a run of kana and kanji, cut into words with their readings: the cheapest path through
- * every way the lexicon cuts it (Viterbi), as MeCab would read it. Null when a character has no word.
+ * every way the lexicon cuts it (Viterbi), as MeCab would read it. A word kept as it is written (a
+ * number in digits, a kanji without a reading) has an empty reading.
  */
-export function tokenize(run: string): Token[] | null {
+export function tokenize(run: string): Token[] {
   const ending: Node[][] = [];
   for (let i = 0; i <= run.length; i++) ending.push([]);
   const start: Node = { start: 0, word: { length: 0, reading: '', cls: 0, cost: 0 }, best: 0, previous: undefined };
@@ -96,7 +102,7 @@ export function tokenize(run: string): Token[] | null {
       last = node;
     }
   }
-  if (last === undefined) return null;
+  if (last === undefined) return [];
   const tokens: Token[] = [];
   for (let node: Node | undefined = last; node !== undefined && node !== start; node = node.previous) {
     tokens.push({

@@ -76,14 +76,15 @@ describe('japanese', () => {
     expect(japanese.romanize('ズッキュンドッキュン')).toBe('zukkyundokkyun');
   });
 
-  it('gives nothing for a kanji it has no reading for', () => {
-    expect(japanese.romanize('龘')).toBeNull();
+  it('keeps a kanji it has no reading for as it is written, and reads the rest', () => {
+    expect(japanese.romanize('龘')).toBe('龘');
+    expect(japanese.romanize('君と龘龘の歌')).toBe('kimi to 龘龘 no uta');
   });
 });
 
 describe('tokenize', () => {
   it('cuts a run into words with their readings', () => {
-    expect(tokenize('君を愛してる')?.map((t) => [t.surface, t.reading])).toEqual([
+    expect(tokenize('君を愛してる').map((t) => [t.surface, t.reading])).toEqual([
       ['君', 'キミ'],
       ['を', 'オ'],
       ['愛し', 'アイシ'],

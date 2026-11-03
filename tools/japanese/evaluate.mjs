@@ -5,6 +5,7 @@
 // Usage: node tools/japanese/evaluate.mjs REFERENCE.json MISMATCHES.txt
 import { build } from 'esbuild';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const [referencePath, mismatchesPath] = process.argv.slice(2);
 if (!referencePath || !mismatchesPath) {
@@ -17,7 +18,8 @@ const bundle = await build({
     contents:
       "export { tokenize } from './src/engines/japanese/lattice';" +
       "export { romanizeTokens } from './src/engines/japanese/words';",
-    resolveDir: process.cwd(),
+    // The repository's root, wherever the script is run from.
+    resolveDir: fileURLToPath(new URL('../..', import.meta.url)),
     loader: 'ts',
   },
   bundle: true,
@@ -48,7 +50,8 @@ const mismatches = [];
 const started = performance.now();
 for (const { run, tokens } of reference) {
   const ours = engine.tokenize(run);
-  if (ours === null) {
+  // A kanji the engine has no reading for is kept as it is written, its reading empty.
+  if (ours.some((t) => t.reading === '')) {
     mismatches.push(`UNREAD\t${run}`);
     continue;
   }

@@ -1,3 +1,5 @@
+import { scriptOf } from './script';
+
 /** A piece of a romanized line: Latin letters an engine wrote, or text kept as it was. */
 export interface Part {
   readonly romanized: boolean;
@@ -38,9 +40,11 @@ function latinPunctuation(text: string): string {
   return out;
 }
 
-// Letters and digits a word is made of once in Latin letters, diacritics included (ō, š, ć).
+// Letters and digits a word is made of once in Latin letters, diacritics included (ō, š, ć), and
+// the letters of a word kept as it is written, which no engine read (koi no Δ).
 function isWordChar(c: string): boolean {
-  return /[0-9A-Za-zÀ-ɏḀ-ỿ]/.test(c);
+  const script = scriptOf(c.charCodeAt(0));
+  return /[0-9A-Za-zÀ-ɏḀ-ỿ]/.test(c) || (script !== 'neutral' && script !== 'digit');
 }
 
 // Where two parts join, a word after one of these starts a new phrase: "kimi! boku".

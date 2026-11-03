@@ -2,26 +2,40 @@ import { assemble, type Part } from './assemble';
 import { songLanguages, type SongLanguages } from './language';
 import type { Engines } from './romanizer';
 import { languageRuns, scriptRuns } from './runs';
+import { scriptOf } from './script';
+import { codePointAt, unitsOf } from './text';
+
+// A romanization that leaves more than this share of a line's letters as they are written does not
+// help read it, and the line is likely in a language no engine reads (Chinese in a Japanese song).
+const MAX_UNREAD = 1 / 4;
+
+/** How many letters of [text] are of a script a romanization changes: not Latin, digits, punctuation. */
+function lettersIn(text: string): number {
+  let letters = 0;
+  for (let i = 0; i < text.length;) {
+    const cp = codePointAt(text, i);
+    const script = scriptOf(cp);
+    if (script !== 'neutral' && script !== 'digit') letters++;
+    i += unitsOf(cp);
+  }
+  return letters;
+}
 
 /**
- * [line] in Latin letters, or null when a piece of it has no engine, or its engine cannot read it
- * all: a line is romanized whole or not at all.
+ * [line] in Latin letters, what no engine reads kept as it is written (a kanji the lexicon has no
+ * reading for, a script no engine romanizes); null when that is more than a quarter of its letters.
  */
 export function romanizeLine(line: string, languages: SongLanguages, engines: Engines): string | null {
   const parts: Part[] = [];
-  let romanized = false;
   for (const run of languageRuns(scriptRuns(line), languages)) {
-    if (run.language === null) {
-      parts.push({ romanized: false, text: run.text });
-      continue;
-    }
-    if (run.language === 'other') return null;
-    const latin = engines[run.language]?.romanize(run.text) ?? null;
-    if (latin === null) return null;
-    parts.push({ romanized: true, text: latin });
-    romanized = true;
+    const engine = run.language === null || run.language === 'other' ? undefined : engines[run.language];
+    const latin = engine?.romanize(run.text) ?? null;
+    parts.push(latin === null ? { romanized: false, text: run.text } : { romanized: true, text: latin });
   }
-  return romanized ? assemble(parts) : null;
+  const latin = assemble(parts);
+  const letters = lettersIn(line);
+  const unread = lettersIn(latin);
+  return unread < letters && unread <= letters * MAX_UNREAD ? latin : null;
 }
 
 /**

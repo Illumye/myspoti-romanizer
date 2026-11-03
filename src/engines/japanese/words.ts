@@ -2,13 +2,21 @@ import { hepburn } from './hepburn';
 import type { Token } from './lattice';
 import { Flag, hasFlag } from './lexicon';
 
+const NUMBER = /^[0-9]+$/;
+
+/** A number in digits: written as it is, a word of its own (20 sai, dai 2 shō). */
+function isNumber(token: Token): boolean {
+  return NUMBER.test(token.surface);
+}
+
 /**
  * Whether [next] is written together with [token], as cutlet writes them: a prefix with what
  * follows (osake), a suffix, a conjunctive particle or an auxiliary with what precedes them
  * (bokura, omoeba, aishiteru, itta), but desu apart (tenki desu); and, unlike cutlet, a number
- * with its counter or its next digit (ichido, nijū).
+ * with its counter or its next digit (ichido, nijū), unless it is written in digits.
  */
 function joined(token: Token, next: Token): boolean {
+  if (isNumber(token) || isNumber(next)) return false;
   if (hasFlag(token.cls, Flag.prefix)) return true;
   if (hasFlag(next.cls, Flag.suffix) || hasFlag(next.cls, Flag.conjunctive)) return true;
   if (hasFlag(token.cls, Flag.numeral) && (hasFlag(next.cls, Flag.counter) || hasFlag(next.cls, Flag.numeral))) {
@@ -40,6 +48,10 @@ export function romanizeTokens(tokens: readonly Token[]): string | null {
     const token = tokens[i];
     if (token === undefined) break;
     const next = tokens[i + 1];
+    if (isNumber(token)) {
+      words.push(token.surface);
+      continue;
+    }
     if (reading === '') proper = hasFlag(token.cls, Flag.proper);
     reading += readingOf(token, next);
     if (next !== undefined && joined(token, next)) continue;

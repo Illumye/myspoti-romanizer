@@ -36,6 +36,20 @@ describe('languageRuns', () => {
     expect(languageRuns(scriptRuns('永远'), chinese)).toEqual([{ language: 'zh', text: '永远' }]);
   });
 
+  it('reads digits with the phrase they touch, and keeps the others apart', () => {
+    expect(languageRuns(scriptRuns('20歳の夏'), japanese)).toEqual([{ language: 'ja', text: '20歳の夏' }]);
+    expect(languageRuns(scriptRuns('あと3 秒'), japanese)).toEqual([
+      { language: 'ja', text: 'あと3' },
+      { language: null, text: ' ' },
+      { language: 'ja', text: '秒' },
+    ]);
+    expect(languageRuns(scriptRuns('2024'), japanese)).toEqual([{ language: null, text: '2024' }]);
+    expect(languageRuns(scriptRuns('20살'), japanese)).toEqual([
+      { language: null, text: '20' },
+      { language: 'ko', text: '살' },
+    ]);
+  });
+
   it('keeps neutral text apart and marks the letters no engine reads', () => {
     expect(languageRuns(scriptRuns('Ἀθήνα, Москва'), japanese)).toEqual([
       { language: 'other', text: 'Ἀθήνα' },

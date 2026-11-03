@@ -1,15 +1,18 @@
 /**
- * The scripts the romanizer tells apart in a line. `neutral` stays as it is: Latin letters, digits,
- * punctuation, symbols, spaces. `other` is a letter of a script it does not romanize (Greek,
- * Arabic, Thai...): its line gets no romanization rather than half of one.
+ * The scripts the romanizer tells apart in a line. `neutral` stays as it is: Latin letters,
+ * punctuation, symbols, spaces. `digit`, an ASCII digit (NFKC makes the fullwidth ones so), stays as
+ * it is too, but is read with the Japanese it touches: a number is said with its counter (20歳 is
+ * 20 sai). `other` is a letter of a script it does not romanize (Greek, Arabic, Thai...): its line
+ * gets no romanization rather than half of one.
  */
-export type Script = 'neutral' | 'kana' | 'han' | 'hangul' | 'cyrillic' | 'other';
+export type Script = 'neutral' | 'digit' | 'kana' | 'han' | 'hangul' | 'cyrillic' | 'other';
 
 type Range = readonly [start: number, end: number, script: Script];
 
 // Sorted, inclusive, non-overlapping. A code point in none of them is neutral below Greek (Latin,
 // IPA, combining marks) and `other` above it, unless listed here as neutral.
 const RANGES: readonly Range[] = [
+  [0x0030, 0x0039, 'digit'],
   [0x0400, 0x052f, 'cyrillic'],
   [0x1100, 0x11ff, 'hangul'], // Jamo
   [0x1c80, 0x1c8f, 'cyrillic'], // Extended-C

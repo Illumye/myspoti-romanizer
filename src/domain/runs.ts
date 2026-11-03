@@ -47,6 +47,7 @@ export function scriptRuns(line: string): ScriptRun[] {
 function languageOf(script: Script, languages: SongLanguages): LanguageRun['language'] {
   switch (script) {
     case 'neutral':
+    case 'digit':
       return null;
     case 'kana':
       return 'ja';
@@ -61,15 +62,22 @@ function languageOf(script: Script, languages: SongLanguages): LanguageRun['lang
   }
 }
 
+function isPhrase(run: ScriptRun | undefined): boolean {
+  return run !== undefined && (run.script === 'kana' || run.script === 'han');
+}
+
 /**
  * [runs] as they are read in a song of [languages]. Kana and Han side by side are one phrase,
- * Japanese when it holds kana or the song is Japanese, Chinese otherwise.
+ * Japanese when it holds kana or the song is Japanese, Chinese otherwise. Digits that touch a
+ * phrase are read with it, as a number is said with its counter (20歳, あと3秒).
  */
 export function languageRuns(runs: readonly ScriptRun[], languages: SongLanguages): LanguageRun[] {
   const out: LanguageRun[] = [];
   let phrase: { text: string; kana: boolean } | undefined;
-  for (const run of runs) {
-    if (run.script === 'kana' || run.script === 'han') {
+  for (let i = 0; i < runs.length; i++) {
+    const run = runs[i];
+    if (run === undefined) break;
+    if (isPhrase(run) || (run.script === 'digit' && (phrase !== undefined || isPhrase(runs[i + 1])))) {
       phrase = { text: (phrase?.text ?? '') + run.text, kana: (phrase?.kana ?? false) || run.script === 'kana' };
       continue;
     }

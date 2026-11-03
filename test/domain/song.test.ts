@@ -32,6 +32,7 @@ describe('romanizeSong', () => {
 
   it('reads compatibility forms as their usual letters', () => {
     expect(romanizeSong(song('ｶﾗｵｹ'), engines).get(0)).toBe('ja(カラオケ)');
+    expect(romanizeSong(song('２０歳'), engines, 'ja').get(0)).toBe('ja(20歳)');
   });
 
   it("reads the song's Cyrillic as the source says, else as its letters show", () => {

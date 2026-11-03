@@ -84,14 +84,23 @@ function decode(start: number, length: number): Word {
   return { length, reading, cls: twoDigits(LEXICON, end - 3), cost: digit(LEXICON, end - 1) * COST_STEP };
 }
 
+// ASCII digits are the codes of hiragana: a number's own digits are spelled fullwidth, as
+// tools/japanese/encode.py writes them in surfaces (2人).
+const TO_FULLWIDTH = 0xff10 - 0x30;
+
 /**
  * [run] as the lexicon spells its surfaces: each hiragana as its digit (a third of its UTF-8 in
- * the script), the rest as it is. One character for one, so positions stay the same.
+ * the script), a number's digit fullwidth, the rest as it is. One character for one, so positions
+ * stay the same.
  */
 export function coded(run: string): string {
   let out = '';
   for (let i = 0; i < run.length; i++) {
     const c = run.charAt(i);
+    if (c >= '0' && c <= '9') {
+      out += String.fromCharCode(c.charCodeAt(0) + TO_FULLWIDTH);
+      continue;
+    }
     const k = HIRAGANA.indexOf(c);
     out += k < 0 ? c : DIGITS.charAt(k);
   }

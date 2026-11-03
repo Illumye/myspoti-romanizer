@@ -1,4 +1,4 @@
-import { MAX_SURFACE, UNKNOWN } from './data/model.generated';
+import { MAX_SURFACE, NUMERAL, UNKNOWN } from './data/model.generated';
 import { coded, transition, wordsAt, type Word } from './lexicon';
 
 /** A word of a run, as the cheapest reading of the run cuts it. */
@@ -16,8 +16,13 @@ interface Node {
 }
 
 // What no word of the lexicon covers: a run of katakana is read as it is written (a loanword, a
-// name), a lone kana too at a high cost; a kanji has no reading to guess, and leaves the run unread.
+// name), a number in digits as a numeral, so that what follows reads as its counter (20歳, sai), a
+// lone kana at a high cost; a kanji has no reading to guess, and leaves the run unread.
 const LONE_KANA_COST = 2000;
+
+function isDigit(c: string): boolean {
+  return c >= '0' && c <= '9';
+}
 
 function isKatakana(c: string): boolean {
   return (c >= 'ァ' && c <= 'ヺ') || c === 'ー';
@@ -31,11 +36,21 @@ function toKatakana(c: string): string {
   return c >= 'ぁ' && c <= 'ゖ' ? String.fromCharCode(c.charCodeAt(0) + 0x60) : c;
 }
 
+/** Where the characters from [from] that pass [test] end. */
+function spanEnd(run: string, from: number, test: (c: string) => boolean): number {
+  let end = from + 1;
+  while (end < run.length && test(run.charAt(end))) end++;
+  return end;
+}
+
 function unknownWords(run: string, from: number, known: readonly Word[]): Word[] {
   const c = run.charAt(from);
+  if (isDigit(c)) {
+    const end = spanEnd(run, from, isDigit);
+    return [{ length: end - from, reading: run.slice(from, end), cls: NUMERAL.cls, cost: NUMERAL.cost }];
+  }
   if (isKatakana(c)) {
-    let end = from + 1;
-    while (end < run.length && isKatakana(run.charAt(end))) end++;
+    const end = spanEnd(run, from, isKatakana);
     return [{ length: end - from, reading: run.slice(from, end), cls: UNKNOWN.cls, cost: UNKNOWN.cost }];
   }
   if (known.length === 0 && isKana(c)) {

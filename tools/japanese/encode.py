@@ -14,6 +14,9 @@ assert len(KANA) <= BASE and len(HIRAGANA) <= BASE
 
 _KANA_CODE = {ch: DIGITS[i] for i, ch in enumerate(KANA)}
 _HIRAGANA_CODE = {ch: DIGITS[i] for i, ch in enumerate(HIRAGANA)}
+# The ASCII digits code hiragana: a number's own digits in a surface (2人) are written fullwidth, as
+# the extension spells them when it looks a run up (coded in src/engines/japanese/lexicon.ts).
+_NUMBER_DIGIT = {chr(0x30 + d): chr(0xFF10 + d) for d in range(10)}
 
 
 def number(n: int, width: int) -> str:
@@ -30,7 +33,7 @@ def reading_code(reading: str) -> str | None:
 
 
 def surface_code(surface: str) -> str:
-    return "".join(_HIRAGANA_CODE.get(ch, ch) for ch in surface)
+    return "".join(_HIRAGANA_CODE.get(ch) or _NUMBER_DIGIT.get(ch, ch) for ch in surface)
 
 
 def write_model(path: str, model: dict) -> None:
@@ -72,6 +75,9 @@ def write_model(path: str, model: dict) -> None:
         "",
         "/** A run of katakana no word covers: a common noun, at this cost. */",
         f"export const UNKNOWN = {{ cls: {model['unknown_class']}, cost: {model['unknown_cost']} }};",
+        "",
+        "/** A number in digits: a numeral, at what a numeral costs on average. */",
+        f"export const NUMERAL = {{ cls: {model['numeral_class']}, cost: {model['numeral_cost']} }};",
         "",
     ]
     with open(path, "w", encoding="utf-8") as out:

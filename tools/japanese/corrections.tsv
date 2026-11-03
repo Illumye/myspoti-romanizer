@@ -16,12 +16,28 @@ add	お兄さん	オニーサン	名詞|普通名詞|一般	和	1000	one word, o
 add	お姉さん	オネーサン	名詞|普通名詞|一般	和	1000	one word, onēsan
 add	お兄ちゃん	オニーチャン	名詞|普通名詞|一般	和	1000	one word, oniichan
 add	お姉ちゃん	オネーチャン	名詞|普通名詞|一般	和	1000	one word, onēchan
-add	一つ	ヒトツ	名詞|数詞|*	和	2000	the native counter: hitotsu, not ichi tsu
-add	二つ	フタツ	名詞|数詞|*	和	2000	futatsu
-add	三つ	ミッツ	名詞|数詞|*	和	1000	mittsu
-add	四つ	ヨッツ	名詞|数詞|*	和	1000	yottsu
-add	五つ	イツツ	名詞|数詞|*	和	1000	itsutsu
-add	六つ	ムッツ	名詞|数詞|*	和	500	muttsu
-add	七つ	ナナツ	名詞|数詞|*	和	500	nanatsu
-add	八つ	ヤッツ	名詞|数詞|*	和	500	yattsu
-add	九つ	ココノツ	名詞|数詞|*	和	500	kokonotsu
+add	一つ	ヒトツ	名詞|普通名詞|副詞可能	和	2000	the native counter: hitotsu, not ichi tsu; a quantity as 一人 is, so neither joined to what follows nor kept from a particle
+add	二つ	フタツ	名詞|普通名詞|副詞可能	和	2000	futatsu
+add	三つ	ミッツ	名詞|普通名詞|副詞可能	和	1000	mittsu
+add	四つ	ヨッツ	名詞|普通名詞|副詞可能	和	1000	yottsu
+add	五つ	イツツ	名詞|普通名詞|副詞可能	和	1000	itsutsu
+add	六つ	ムッツ	名詞|普通名詞|副詞可能	和	500	muttsu
+add	七つ	ナナツ	名詞|普通名詞|副詞可能	和	500	nanatsu
+add	八つ	ヤッツ	名詞|普通名詞|副詞可能	和	500	yattsu
+add	九つ	ココノツ	名詞|普通名詞|副詞可能	和	500	kokonotsu
+add	三十路	ミソジ	名詞|普通名詞|一般	和	1000	misoji, one's thirties; sanjū ro otherwise
+add	二十歳	ハタチ	名詞|普通名詞|一般	和	2000	hatachi, twenty years old; nijūsai otherwise
+add	日本刀	ニホントー	名詞|普通名詞|一般	漢	1000	one word, nihontō; Nippon katana otherwise
+add	浮き世	ウキヨ	名詞|普通名詞|一般	和	1000	one word, ukiyo, as 浮世 is; uki yo otherwise
+add	20歳	ハタチ	名詞|普通名詞|一般	和	2000	written in digits, hatachi all the same
+add	1人	ヒトリ	名詞|普通名詞|副詞可能	和	2000	in digits too, the native count: hitori, not 1 nin
+add	2人	フタリ	名詞|普通名詞|副詞可能	和	2000	futari
+add	1つ	ヒトツ	名詞|普通名詞|副詞可能	和	2000	hitotsu
+add	2つ	フタツ	名詞|普通名詞|副詞可能	和	2000	futatsu
+add	3つ	ミッツ	名詞|普通名詞|副詞可能	和	1000	mittsu
+add	4つ	ヨッツ	名詞|普通名詞|副詞可能	和	1000	yottsu
+add	5つ	イツツ	名詞|普通名詞|副詞可能	和	1000	itsutsu
+add	6つ	ムッツ	名詞|普通名詞|副詞可能	和	500	muttsu
+add	7つ	ナナツ	名詞|普通名詞|副詞可能	和	500	nanatsu
+add	8つ	ヤッツ	名詞|普通名詞|副詞可能	和	500	yattsu
+add	9つ	ココノツ	名詞|普通名詞|副詞可能	和	500	kokonotsu

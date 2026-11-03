@@ -27,6 +27,27 @@ describe('japanese', () => {
     expect(japanese.romanize('お母さん')).toBe('okāsan');
     expect(japanese.romanize('並ぶ影が二つ')).toBe('narabu kage ga futatsu');
     expect(japanese.romanize('風に吹かれて')).toBe('kaze ni fukarete');
+    expect(japanese.romanize('三十路を過ぎて')).toBe('misoji o sugite');
+    expect(japanese.romanize('二十歳になった')).toBe('hatachi ni natta');
+    expect(japanese.romanize('日本刀を抜いて')).toBe('nihontō o nuite');
+    expect(japanese.romanize('浮き世の夢')).toBe('ukiyo no yume');
+    expect(japanese.romanize('一つだけ')).toBe('hitotsu dake');
+    expect(japanese.romanize('一つ一つ')).toBe('hitotsu hitotsu');
+  });
+
+  it('reads a number in digits as a numeral, kept in digits, with its counter after it', () => {
+    expect(japanese.romanize('17歳')).toBe('17 sai');
+    expect(japanese.romanize('3人で')).toBe('3 nin de');
+    expect(japanese.romanize('10時に')).toBe('10 ji ni');
+    expect(japanese.romanize('5分だけ')).toBe('5 fun dake');
+    expect(japanese.romanize('第2章')).toBe('dai 2 shō');
+    expect(japanese.romanize('21人')).toBe('21 nin');
+  });
+
+  it('reads a number in digits the way it is said where its count is a word of its own', () => {
+    expect(japanese.romanize('20歳の夏')).toBe('hatachi no natsu');
+    expect(japanese.romanize('2人で歩いた')).toBe('futari de aruita');
+    expect(japanese.romanize('1つだけ')).toBe('hitotsu dake');
   });
 
   it('reads 何 nani before a particle that marks it, nan before t, d, n', () => {

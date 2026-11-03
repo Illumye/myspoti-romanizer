@@ -24,6 +24,7 @@ COST_STEP = 20  # and so is one cost digit: the same precision for words and tra
 SMOOTHING = 0.1
 MAX_SURFACE = 8
 UNKNOWN_CLASS = "名詞|普通名詞|一般"
+NUMERAL_CLASS = "名詞|数詞|*"
 CORRECTIONS = Path(__file__).with_name("corrections.tsv")
 
 
@@ -140,6 +141,11 @@ def main() -> None:
 
     unknown = cls(UNKNOWN_CLASS)
     share = (stats["unknown"].get(UNKNOWN_CLASS, 0) + 1) / (class_total[unknown] + 1)
+    # A number in digits is some numeral or other: it costs what one costs on average (the
+    # entropy of the class), so that a word of the lexicon written with it (2人) still wins.
+    numeral = cls(NUMERAL_CLASS)
+    shares = [n / class_total[numeral] for (_, _, key), (n, _) in entries.items() if cls(key) == numeral]
+    numeral_cost = round(-sum(q * math.log(q) for q in shares if 0 < q <= 1) * 100)
     write_model(
         args.out,
         {
@@ -153,6 +159,8 @@ def main() -> None:
             "cost_step": COST_STEP,
             "unknown_class": unknown,
             "unknown_cost": round(-math.log(share) * 100),
+            "numeral_class": numeral,
+            "numeral_cost": numeral_cost,
         },
     )
     print(f"{size} classes, {len(records)} words, {used / 1024:.0f} KB, {corrected} corrections")

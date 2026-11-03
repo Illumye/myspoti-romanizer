@@ -18,7 +18,7 @@ const cases: readonly (readonly [string, Script])[] = [
   ['ў', 'cyrillic'],
   ['a', 'neutral'],
   ['é', 'neutral'],
-  ['7', 'neutral'],
+  ['7', 'digit'],
   ['♪', 'neutral'],
   ['😀', 'neutral'],
   ['α', 'other'],

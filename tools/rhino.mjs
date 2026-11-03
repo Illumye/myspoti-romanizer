@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const VARIANTS = ['hook'];
+const VARIANTS = ['compat', 'hook'];
 
 const cli = process.env.MYSPOTI_EXT;
 if (!cli) {

@@ -22,8 +22,22 @@ Japanese lexicon has no reading for, gets nothing rather than half a romanizatio
 decided for the whole song (a line of kanji alone is Japanese in a song with kana elsewhere), the
 lyrics' own language first when their source gives it.
 
-It needs a Myspoti with the `lyrics-romanize` hook, proposed upstream
-([kota-zo/myspoti#154](https://github.com/kota-zo/myspoti/issues/154)).
+## Two variants, one extension
+
+Both carry the same id, so going from one to the other is an update.
+
+- **For Myspoti as it is** (`extension.zip`, the store's): it answers the `lyrics` hook with the
+  song's lyrics, Spotify's own or LRCLIB's, each line also in Latin letters; Myspoti matches them to
+  the lyrics it shows and keeps the romanizations. It asks to read Spotify's lyrics and lrclib.net.
+  Where Myspoti does not wait for extensions (Spotify's word-by-word lyrics) or keeps the extras of
+  its own source (a translation), the lines stay without.
+- **For a Myspoti with the `lyrics-romanize` hook** (`extension-hook.zip`), proposed upstream
+  ([kota-zo/myspoti#154](https://github.com/kota-zo/myspoti/issues/154)): Myspoti asks for the lines
+  any source left without a romanization, and nothing else is needed.
+
+Install: from Myspoti's store, or **Install from an address** with
+`https://github.com/Illumye/myspoti-romanizer` (the newest release's `extension.zip`); the hook
+variant with the address of the release's `extension-hook.zip`, or **Install from a file**.
 
 ## Japanese
 
@@ -61,10 +75,12 @@ node evaluate.mjs data/reference.json data/mismatches.txt
 - `src/domain`: the scripts of a line (code point ranges), the song's languages, the line cut into
   runs and put back together, within a time budget. Nothing in it knows Myspoti.
 - `src/engines`: one romanizer per language, behind the `Romanizer` interface.
-- `src/adapters/myspoti`: the `lyrics-romanize` hook.
-- `tools/build.mjs`: esbuild bundles the extension, SWC lowers it to ES5 for Myspoti's sandbox
-  (Rhino 1.8.1: no class, spread or for-of), and the package is zipped into `dist/`;
-  `tools/rhino-compat.mjs` adapts what a dependency needs to load there.
+- `src/adapters/myspoti`: the `lyrics-romanize` hook (`hook.ts`) and the `lyrics` one (`compat.ts`,
+  with the lyrics of Spotify and LRCLIB in `sources.ts`).
+- `tools/build.mjs`: esbuild bundles each variant, SWC lowers it to ES5 for Myspoti's sandbox
+  (Rhino 1.8.1: no class, spread or for-of), each package is zipped into `dist/`, and the store
+  variant's manifest written at the root, where Myspoti's store reads it; `tools/rhino-compat.mjs`
+  adapts what a dependency needs to load there.
 
 ## Development
 
@@ -77,6 +93,10 @@ MYSPOTI_EXT=/path/to/myspoti-ext npm run rhino    # the built packages in Myspot
 `MYSPOTI_EXT` is the `myspoti-ext` launcher of a Myspoti build with the hook
 (`base/extensions-cli/build/install/myspoti-ext/bin/myspoti-ext` after
 `./gradlew :extensions-cli:installDist`).
+
+A release is a tag `vX.Y.Z` matching `package.json`'s version: the Release workflow checks it,
+builds, and attaches `extension.zip` and `extension-hook.zip`. The repository's topic
+`myspoti-extension` lists it in Myspoti's store.
 
 ## License
 

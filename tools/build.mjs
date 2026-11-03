@@ -13,8 +13,9 @@ import { esHangulWithoutUnicodeFlag } from './rhino-compat.mjs';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 // Myspoti refuses a package whose script is larger (docs/extensions/API.md, section 7).
 const MAX_SCRIPT_BYTES = 1024 * 1024;
-// hook: for a Myspoti with lyrics-romanize.
+// compat: for any Myspoti, through the lyrics hook; hook: for a Myspoti with lyrics-romanize.
 const VARIANTS = [
+  { name: 'compat', entry: 'src/main.compat.ts', manifest: 'manifests/compat.json', zip: 'extension.zip', store: true },
   { name: 'hook', entry: 'src/main.hook.ts', manifest: 'manifests/hook.json', zip: 'extension-hook.zip' },
 ];
 // One date for every file of a package, so that the same sources give the same zip.

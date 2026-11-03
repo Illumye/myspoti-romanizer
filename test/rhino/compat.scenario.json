@@ -1,0 +1,19 @@
+{
+  "offline": true,
+  "track": { "title": "Song", "artist": "Artist", "album": "Album", "durationMs": 200000 },
+  "http": [
+    {
+      "match": "lrclib.net/api/get",
+      "times": 1,
+      "body": "{\"syncedLyrics\":\"[00:01.00]君を愛してる\\n[00:05.00]Hello\\n[00:09.00]사랑해 너를\"}"
+    },
+    {
+      "match": "lrclib.net/api/get",
+      "body": "{\"syncedLyrics\":\"[00:01.00]Hello\\n[00:05.00]World\"}"
+    }
+  ],
+  "steps": [
+    { "hook": "lyrics", "expect": { "outcome": "found" } },
+    { "hook": "lyrics", "expect": { "outcome": "not-found" } }
+  ]
+}

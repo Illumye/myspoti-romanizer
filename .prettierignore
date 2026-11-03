@@ -3,3 +3,4 @@ coverage/
 package-lock.json
 src/engines/japanese/data/
 tools/japanese/.venv/
+manifest.json

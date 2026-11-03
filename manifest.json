@@ -1,0 +1,33 @@
+{
+  "id": "io.github.illumye.romanizer",
+  "name": "Lyrics Romanizer",
+  "author": "Illumye",
+  "description": "Writes lyrics in Japanese, Korean and Cyrillic scripts in Latin letters, offline, under each line of the songs whose lyrics come without a romanization.",
+  "category": "lyrics",
+  "tags": [
+    "romanization",
+    "romaji",
+    "japanese",
+    "korean",
+    "cyrillic"
+  ],
+  "actions": [
+    {
+      "name": "lyrics.provide",
+      "why": "Gives the song's lyrics back with each line also in Latin letters"
+    },
+    {
+      "name": "spotify.catalog",
+      "why": "Reads Spotify's lyrics of the song, to romanize the very lines shown"
+    },
+    {
+      "name": "network",
+      "hosts": [
+        "lrclib.net"
+      ],
+      "why": "Reads the song's lyrics on lrclib.net when Spotify has none"
+    }
+  ],
+  "version": "0.1.0",
+  "versionCode": 100
+}

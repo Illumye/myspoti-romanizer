@@ -1,0 +1,33 @@
+{
+  "name": "myspoti-romanizer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Myspoti extension that romanizes lyrics written in Japanese, Korean and Cyrillic scripts, offline.",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run lint && npm test && npm run build",
+    "rhino": "npm run build && node tools/rhino.mjs"
+  },
+  "dependencies": {
+    "es-hangul": "2.4.0"
+  },
+  "devDependencies": {
+    "@swc/core": "1.16.21",
+    "esbuild": "0.28.2",
+    "eslint": "10.14.0",
+    "fflate": "0.8.3",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
+  }
+}

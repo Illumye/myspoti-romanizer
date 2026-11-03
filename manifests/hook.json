@@ -1,0 +1,14 @@
+{
+  "id": "io.github.illumye.romanizer",
+  "name": "Lyrics Romanizer",
+  "author": "Illumye",
+  "description": "Writes lyrics in Japanese, Korean and Cyrillic scripts in Latin letters, offline, under each line of the songs whose lyrics come without a romanization.",
+  "category": "lyrics",
+  "tags": ["romanization", "romaji", "japanese", "korean", "cyrillic"],
+  "actions": [
+    {
+      "name": "lyrics.romanize",
+      "why": "Writes Japanese, Korean and Cyrillic lyrics in Latin letters, offline"
+    }
+  ]
+}

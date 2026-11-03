@@ -1,0 +1,27 @@
+{
+  "offline": true,
+  "steps": [
+    {
+      "hook": "lyrics-romanize",
+      "language": "ko",
+      "lines": ["사랑해 너를", "국물이 좋아, 신라!"],
+      "expect": {
+        "outcome": "found"
+      }
+    },
+    {
+      "hook": "lyrics-romanize",
+      "lines": ["Я тебя люблю", "Київ"],
+      "expect": {
+        "outcome": "found"
+      }
+    },
+    {
+      "hook": "lyrics-romanize",
+      "lines": ["Ἀθήνα"],
+      "expect": {
+        "outcome": "not-found"
+      }
+    }
+  ]
+}

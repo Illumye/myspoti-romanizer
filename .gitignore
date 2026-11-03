@@ -2,3 +2,6 @@ node_modules/
 dist/
 coverage/
 *.log
+tools/japanese/.venv/
+tools/japanese/data/
+__pycache__/

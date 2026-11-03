@@ -1,0 +1,27 @@
+# Where songs read otherwise than UniDic 2.1.2, which the model is distilled from. One per line,
+# fields separated by tabs:
+#   reread  surface  pronunciation  new pronunciation  why
+#   drop    surface  pronunciation  why
+#   add     surface  pronunciation  class  origin  count  why
+# The pronunciation is UniDic's: katakana, ー where a vowel is held long.
+reread	私	ワタクシ	ワタシ	songs say watashi; UniDic reads every 私 as the formal watakushi
+reread	明日	アス	アシタ	songs say ashita far more than the written asu
+drop	風	フー	the "style" reading of 風 as a noun outweighs kaze (wind) in subtitles, rarely in songs
+drop	一日	ツイタチ	the first of the month; in songs 一日 is a whole day, ichinichi
+add	お母さん	オカーサン	名詞|普通名詞|一般	和	2000	UniDic cuts it into o, haha, san
+add	お父さん	オトーサン	名詞|普通名詞|一般	和	2000	UniDic cuts it into o, chichi, san
+add	母さん	カーサン	名詞|普通名詞|一般	和	1000	read haha san otherwise
+add	父さん	トーサン	名詞|普通名詞|一般	和	1000	read chichi san otherwise
+add	お兄さん	オニーサン	名詞|普通名詞|一般	和	1000	one word, oniisan
+add	お姉さん	オネーサン	名詞|普通名詞|一般	和	1000	one word, onēsan
+add	お兄ちゃん	オニーチャン	名詞|普通名詞|一般	和	1000	one word, oniichan
+add	お姉ちゃん	オネーチャン	名詞|普通名詞|一般	和	1000	one word, onēchan
+add	一つ	ヒトツ	名詞|数詞|*	和	2000	the native counter: hitotsu, not ichi tsu
+add	二つ	フタツ	名詞|数詞|*	和	2000	futatsu
+add	三つ	ミッツ	名詞|数詞|*	和	1000	mittsu
+add	四つ	ヨッツ	名詞|数詞|*	和	1000	yottsu
+add	五つ	イツツ	名詞|数詞|*	和	1000	itsutsu
+add	六つ	ムッツ	名詞|数詞|*	和	500	muttsu
+add	七つ	ナナツ	名詞|数詞|*	和	500	nanatsu
+add	八つ	ヤッツ	名詞|数詞|*	和	500	yattsu
+add	九つ	ココノツ	名詞|数詞|*	和	500	kokonotsu

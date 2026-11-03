@@ -19,7 +19,7 @@ const RHINO_REGEX = [
 ];
 
 export default defineConfig(
-  globalIgnores(['dist/', 'coverage/']),
+  globalIgnores(['dist/', 'coverage/', 'tools/japanese/.venv/', 'src/engines/japanese/data/']),
   {
     files: ['**/*.ts'],
     extends: [tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],

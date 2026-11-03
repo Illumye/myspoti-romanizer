@@ -3,10 +3,12 @@ the model and to learn the words of songs: lyrics are copyrighted, the file stay
 tools/japanese/data, out of the repository, and only word counts reach the model. One line of
 lyrics per line, the lines with kana only, each once.
 
-Two lists of artists, apart: one for the evaluation, one for training on the vocabulary of songs,
-so that the measure never reads lyrics the model learned from.
+Three lists of artists, apart: one for the evaluation, one for training on the vocabulary of songs,
+so that the measure never reads lyrics the model learned from, and a hard one, measured on its own,
+where songs stray furthest from the subtitles the model comes from: rap and its slang, Vocaloid
+wordplay, classical Japanese.
 
-Usage: fetch_lyrics.py OUT.txt [--set evaluation|training] [--per-artist N] [--exclude LINES.txt]
+Usage: fetch_lyrics.py OUT.txt [--set evaluation|training|hard] [--per-artist N] [--exclude LINES.txt]...
 """
 
 import argparse
@@ -31,6 +33,11 @@ TRAINING = [
     "家入レオ", "大塚愛", "倖田來未", "浜崎あゆみ", "安室奈美恵", "B'z", "GLAY", "サザンオールスターズ",
     "THE BACK HORN", "羊文学", "Hump Back", "the peggies", "sumika", "スキマスイッチ",
 ]
+# LRCLIB files some artists under their Latin name, some under their Japanese one: both are asked.
+HARD = [
+    "Zeebra", "Creepy Nuts", "RHYMESTER", "ピノキオピー", "PinocchioP", "和楽器バンド", "Wagakki Band",
+]
+SETS = {"evaluation": EVALUATION, "training": TRAINING, "hard": HARD}
 USER_AGENT = "myspoti-romanizer-evaluation (https://github.com/kota-zo/myspoti)"
 
 
@@ -56,17 +63,17 @@ def search(artist: str, attempts: int = 4) -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("out")
-    parser.add_argument("--set", choices=("evaluation", "training"), default="evaluation")
+    parser.add_argument("--set", choices=tuple(SETS), default="evaluation")
     parser.add_argument("--per-artist", type=int, default=6)
-    parser.add_argument("--exclude", help="a file of lines to leave out, such as the evaluation's")
+    parser.add_argument("--exclude", action="append", default=[], help="a file of lines to leave out, such as the evaluation's")
     args = parser.parse_args()
 
     seen: set[str] = set()
-    if args.exclude:
-        with open(args.exclude, encoding="utf-8") as excluded:
-            seen = {line.strip() for line in excluded}
+    for path in args.exclude:
+        with open(path, encoding="utf-8") as excluded:
+            seen |= {line.strip() for line in excluded}
     lines, songs = [], 0
-    for artist in EVALUATION if args.set == "evaluation" else TRAINING:
+    for artist in SETS[args.set]:
         try:
             results = search(artist)
         except OSError as error:

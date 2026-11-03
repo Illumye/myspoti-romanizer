@@ -73,6 +73,10 @@ the lyrics of 230 songs, for the words songs use and subtitles do not. On the ly
 songs, by other artists, it reads 99.1 % of the runs, 94.5 % exactly as MeCab does; most of the
 others are the readings it corrects on purpose for songs (`tools/japanese/corrections.tsv`: 私
 watashi, 明日 ashita, お母さん okāsan, 二つ futatsu, 三十路 misoji, 何 nani or nan by what follows).
+On 60 songs kept apart to stress it, the furthest from subtitles (rap and its slang: Zeebra,
+Creepy Nuts, RHYMESTER; Vocaloid wordplay: PinocchioP; classical Japanese: Wagakki Band), it reads
+98.4 % of the runs, 92.5 % as MeCab does: what it misses there is rare literary words (閻魔, 喧噪,
+俯瞰) more than slang.
 
 The model is rebuilt with Python, in `tools/japanese`. The corpus and the lyrics stay in
 `tools/japanese/data`, out of the repository: only word counts reach the model.
@@ -84,12 +88,15 @@ curl -L -o tools/japanese/data/opensubtitles-ja.txt.gz https://object.pouta.csc.
 cd tools/japanese
 .venv/bin/python fetch_lyrics.py data/lyrics-eval.txt --set evaluation
 .venv/bin/python fetch_lyrics.py data/lyrics-train.txt --set training --per-artist 10 --exclude data/lyrics-eval.txt
+.venv/bin/python fetch_lyrics.py data/lyrics-hard.txt --set hard --per-artist 10 --exclude data/lyrics-eval.txt --exclude data/lyrics-train.txt
 .venv/bin/python stats.py data/opensubtitles-ja.txt.gz data/stats.json.gz
 .venv/bin/python stats.py data/lyrics-train.txt data/stats-lyrics.json.gz
 .venv/bin/python build.py data/stats.json.gz ../../src/engines/japanese/data/model.generated.ts --lyrics data/stats-lyrics.json.gz --lyrics-weight 100
-# measured on the evaluation lyrics only, which the model never learned from
+# measured on lyrics the model never learned from: the evaluation's, then the hard ones
 .venv/bin/python reference.py data/lyrics-eval.txt data/reference.json
 node evaluate.mjs data/reference.json data/mismatches.txt
+.venv/bin/python reference.py data/lyrics-hard.txt data/reference-hard.json
+node evaluate.mjs data/reference-hard.json data/mismatches-hard.txt
 ```
 
 ## How it is built

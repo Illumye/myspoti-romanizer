@@ -26,18 +26,35 @@ lyrics' own language first when their source gives it.
 
 Both carry the same id, so going from one to the other is an update.
 
-- **For Myspoti as it is** (`extension.zip`, the store's): it answers the `lyrics` hook with the
-  song's lyrics, Spotify's own or LRCLIB's, each line also in Latin letters; Myspoti matches them to
-  the lyrics it shows and keeps the romanizations. It asks to read Spotify's lyrics and lrclib.net.
-  Where Myspoti does not wait for extensions (Spotify's word-by-word lyrics) or keeps the extras of
-  its own source (a translation), the lines stay without.
 - **For a Myspoti with the `lyrics-romanize` hook** (`extension-hook.zip`), proposed upstream
   ([kota-zo/myspoti#154](https://github.com/kota-zo/myspoti/issues/154)): Myspoti asks for the lines
-  any source left without a romanization, and nothing else is needed.
+  any source left without a romanization, whatever that source, and nothing else is needed. This is
+  the one to use when your Myspoti has the hook.
+- **For Myspoti as it is** (`extension.zip`, the store's): Myspoti has no way yet to ask an
+  extension for romanizations alone, so this one answers the `lyrics` hook with the song's lyrics,
+  Spotify's own or LRCLIB's, each line also in Latin letters, and Myspoti keeps the romanizations
+  when it matches these lines to the lyrics it shows.
 
 Install: from Myspoti's store, or **Install from an address** with
 `https://github.com/Illumye/myspoti-romanizer` (the newest release's `extension.zip`); the hook
 variant with the address of the release's `extension-hook.zip`, or **Install from a file**.
+
+### What the variant for Myspoti as it is cannot do
+
+It goes through a hook made to give lyrics, not to romanize the ones shown, so some songs keep their
+lines without a romanization where the hook variant gives one:
+
+- **Spotify's word-by-word lyrics.** When Myspoti finds them complete, it does not wait for the
+  extensions at all.
+- **Lyrics with extras of their own.** When the lyrics shown already carry a translation or a
+  romanization from their source (NetEase often gives a translation), Myspoti keeps those and takes
+  nothing from an extension.
+- **Lyrics worded otherwise.** Myspoti keeps the romanizations only when at least a third of the
+  lines match its own word for word; lyrics from a source that writes them differently get none.
+
+It also reads each song's lyrics itself, one more request per song, which is why it asks to read
+Spotify's lyrics and lrclib.net. It shows among the lyrics sources ("Try another source"), and with
+lyrics as good as Myspoti's own it may be the one shown, with the same text.
 
 ## Japanese
 

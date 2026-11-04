@@ -28,6 +28,6 @@
       "why": "Reads the song's lyrics on lrclib.net when Spotify has none"
     }
   ],
-  "version": "0.2.0",
-  "versionCode": 200
+  "version": "0.3.0",
+  "versionCode": 300
 }

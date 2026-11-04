@@ -27,6 +27,7 @@ SMOOTHING = 0.1
 MAX_SURFACE = 8
 UNKNOWN_CLASS = "名詞|普通名詞|一般"
 NUMERAL_CLASS = "名詞|数詞|*"
+PROPER_CLASS = "名詞|固有名詞|人名"
 CORRECTIONS = Path(__file__).with_name("corrections.tsv")
 
 
@@ -206,6 +207,7 @@ def main() -> None:
             "unknown_cost": round(-math.log(share) * 100),
             "numeral_class": numeral,
             "numeral_cost": numeral_cost,
+            "proper_class": cls(PROPER_CLASS),
         },
     )
     print(

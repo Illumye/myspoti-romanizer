@@ -11,7 +11,11 @@ export function answer(input: RomanizeInput, engines: Engines, now: () => number
   const deadline = now() + TIME_BUDGET_MS;
   const lines = new Map<number, string>();
   for (const line of input.lines) lines.set(line.index, line.text);
-  const found = romanizeSong(lines, engines, input.language, () => now() > deadline);
+  const found = romanizeSong(lines, engines, {
+    language: input.language,
+    track: input.track,
+    shouldStop: () => now() > deadline,
+  });
   if (found.size === 0) return null;
   return { lines: Array.from(found, ([index, romanization]) => ({ index, romanization })) };
 }

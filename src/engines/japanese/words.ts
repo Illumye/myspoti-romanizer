@@ -17,6 +17,7 @@ function isNumber(token: Token): boolean {
  * from the words read around it, a number in digits alone, the kanji left unread together.
  */
 function joined(token: Token, next: Token): boolean {
+  if (token.latin !== undefined || next.latin !== undefined) return false;
   if (token.reading === '' || next.reading === '') {
     return token.reading === '' && next.reading === '' && !isNumber(token) && !isNumber(next);
   }
@@ -41,8 +42,8 @@ function readingOf(token: Token, next: Token | undefined): string {
 
 /**
  * [tokens] in revised Hepburn, the words they make apart; a word that starts with a proper noun
- * capitalized (Tōkyō), what has no reading as it is written (20 sai, kimi to 龘). Null when a
- * reading cannot be written.
+ * capitalized (Tōkyō), what has no reading as it is written (20 sai, kimi to 龘), a name the song
+ * spells as it spells it (Kasane). Null when a reading cannot be written.
  */
 export function romanizeTokens(tokens: readonly Token[]): string | null {
   const words: string[] = [];
@@ -53,6 +54,10 @@ export function romanizeTokens(tokens: readonly Token[]): string | null {
     const token = tokens[i];
     if (token === undefined) break;
     const next = tokens[i + 1];
+    if (token.latin !== undefined) {
+      words.push(token.latin);
+      continue;
+    }
     if (reading === '' && written === '') proper = hasFlag(token.cls, Flag.proper);
     if (token.reading === '') written += token.surface;
     else reading += readingOf(token, next);

@@ -17,12 +17,16 @@ import {
   TRANSITION_STEP,
 } from './data/model.generated';
 
-/** A word of the lexicon: its length in the text, its reading in katakana, its class and cost. */
+/**
+ * A word of the lexicon: its length in the text, its reading in katakana, its class and cost; for a
+ * name the song spells (Kasane), that spelling, written as it is.
+ */
 export interface Word {
   readonly length: number;
   readonly reading: string;
   readonly cls: number;
   readonly cost: number;
+  readonly latin?: string | undefined;
 }
 
 const BASE = DIGITS.length;
@@ -212,6 +216,42 @@ export function conjugatedAt(text: string, from: number): Word[] {
     }
   }
   return found;
+}
+
+/** A word or a stem of the lexicon as it is written, its kana as they are, and read. */
+export interface Entry {
+  readonly surface: string;
+  readonly reading: string;
+}
+
+function surfaceOf(codedSurface: string): string {
+  let out = '';
+  for (let i = 0; i < codedSurface.length; i++) {
+    const c = codedSurface.charAt(i);
+    const k = DIGITS.indexOf(c);
+    out += k < 0 ? c : HIRAGANA.charAt(k);
+  }
+  return out;
+}
+
+const entriesMemo = new Map<string, readonly Entry[]>();
+
+/** The words and the stems of verbs and adjectives whose surface starts with [c]: how [c] is read in them. */
+export function entriesStartingWith(c: string): readonly Entry[] {
+  const cached = entriesMemo.get(c);
+  if (cached !== undefined) return cached;
+  const entries: Entry[] = [];
+  for (const records of [WORDS, STEM_RECORDS]) {
+    const block = blockOf(records, c);
+    if (block === undefined) continue;
+    for (let start = block[0]; start < block[1]; start = nextRecord(records, start)) {
+      const surface = surfaceAt(records, start);
+      entries.push({ surface: surfaceOf(surface), reading: decode(records, start, surface.length).reading });
+    }
+  }
+  if (entriesMemo.size >= MEMO_LIMIT) entriesMemo.clear();
+  entriesMemo.set(c, entries);
+  return entries;
 }
 
 /** The cost of class [b] right after class [a], in hundredths of a nat; class 0 starts and ends a run. */

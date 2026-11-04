@@ -1,11 +1,18 @@
 import { MAX_SURFACE, NUMERAL, UNKNOWN } from './data/model.generated';
 import { coded, conjugatedAt, transition, wordsAt, type Word } from './lexicon';
 
-/** A word of a run, as the cheapest reading of the run cuts it. */
+/** A word of a run, as the cheapest reading of the run cuts it; a name with the song's spelling of it. */
 export interface Token {
   readonly surface: string;
   readonly reading: string;
   readonly cls: number;
+  readonly latin?: string | undefined;
+}
+
+/** A word known at a place of a run before it is read: a name the song sings there (names.ts). */
+export interface Pinned {
+  readonly at: number;
+  readonly word: Word;
 }
 
 interface Node {
@@ -66,10 +73,11 @@ function unknownWords(run: string, from: number, known: readonly Word[]): Word[]
 
 /**
  * [run], a run of kana and kanji, cut into words with their readings: the cheapest path through
- * every way the lexicon cuts it (Viterbi), as MeCab would read it. A word kept as it is written (a
- * number in digits, a kanji without a reading) has an empty reading.
+ * every way the lexicon cuts it (Viterbi), as MeCab would read it, with the words [pinned] at their
+ * places besides. A word kept as it is written (a number in digits, a kanji without a reading) has
+ * an empty reading.
  */
-export function tokenize(run: string): Token[] {
+export function tokenize(run: string, pinned: readonly Pinned[] = []): Token[] {
   const ending: Node[][] = [];
   for (let i = 0; i <= run.length; i++) ending.push([]);
   const start: Node = { start: 0, word: { length: 0, reading: '', cls: 0, cost: 0 }, best: 0, previous: undefined };
@@ -80,6 +88,7 @@ export function tokenize(run: string): Token[] {
     const before = ending[i] ?? [];
     if (before.length === 0) continue;
     const known = wordsAt(key, i, MAX_SURFACE).concat(conjugatedAt(key, i));
+    for (const pin of pinned) if (pin.at === i) known.push(pin.word);
     for (const word of known.concat(unknownWords(run, i, known))) {
       const node: Node = { start: i, word, best: Infinity, previous: undefined };
       for (const previous of before) {
@@ -109,6 +118,7 @@ export function tokenize(run: string): Token[] {
       surface: run.slice(node.start, node.start + node.word.length),
       reading: node.word.reading,
       cls: node.word.cls,
+      latin: node.word.latin,
     });
   }
   return tokens.reverse();

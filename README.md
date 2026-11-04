@@ -69,6 +69,12 @@ writes them in revised Hepburn. A number in digits stays in digits, read with it
 17 sai), or as the word it makes (2人, futari; 20歳, hatachi). A word spelled out kana by kana is
 read whole and written kana by kana: は・や・く is ha ya ku, its は no particle.
 
+Names are written as the song's title and artist spell them in Latin letters: two kanji or more
+that read as one of their words, each kanji with a reading the lexicon knows it by (重 kasa, 音 ne:
+Kasane, for Kasane Teto's 重音), unless a word of the lexicon is read so (桜 stays sakura), and a
+katakana word that is one (ルカ, Luka). The voicebanks songs sing are known whatever the credits
+(初音 Hatsune, 鏡音 Kagamine, 巡音 Megurine, 重音 Kasane...).
+
 The words and the costs come from subtitles (3.2 million lines) and, weighted a hundredfold, from
 the lyrics of 230 songs, for the words songs use and subtitles do not. On the lyrics of 66 other
 songs, by other artists, it reads 99.1 % of the runs, 94.5 % exactly as MeCab does; most of the

@@ -21,7 +21,11 @@ export function answerLyrics(
   if (lyrics === null) return null;
   const texts = new Map<number, string>();
   lyrics.lines.forEach((line, index) => texts.set(index, line.text));
-  const found = romanizeSong(texts, engines, lyrics.language, () => now() > deadline);
+  const found = romanizeSong(texts, engines, {
+    language: lyrics.language,
+    track,
+    shouldStop: () => now() > deadline,
+  });
   if (found.size === 0) return null;
   const lines = lyrics.lines.map((line, index) => {
     const romanization = found.get(index);

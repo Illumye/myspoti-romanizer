@@ -112,6 +112,9 @@ def write_model(path: str, model: dict) -> None:
         "/** A number in digits: a numeral, at what a numeral costs on average. */",
         f"export const NUMERAL = {{ cls: {model['numeral_class']}, cost: {model['numeral_cost']} }};",
         "",
+        "/** A person's name: the class of a name a song sings, read from its title or artist. */",
+        f"export const PROPER = {{ cls: {model['proper_class']} }};",
+        "",
     ]
     with open(path, "w", encoding="utf-8") as out:
         out.write("\n".join(lines))

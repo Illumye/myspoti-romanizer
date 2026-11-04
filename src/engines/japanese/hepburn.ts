@@ -5,7 +5,7 @@ const HIRAGANA_LAST = 0x3096;
 const TO_KATAKANA = 0x60;
 
 /** [kana] with its hiragana written in katakana, the iteration marks ゝ ゞ as theirs (ヽ ヾ). */
-function toKatakana(kana: string): string {
+export function toKatakana(kana: string): string {
   let out = '';
   for (let i = 0; i < kana.length; i++) {
     const cp = kana.charCodeAt(i);

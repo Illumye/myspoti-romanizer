@@ -78,6 +78,18 @@ describe('japanese', () => {
     expect(japanese.romanize('わ・た・し・は')).toBe('wa ta shi wa');
   });
 
+  it("reads a name the song's title or artist writes as they write it, unless a word is read so", () => {
+    const song = { names: ['Hikaru', 'Utada', 'Megurine', 'Luka', 'Sakura'] };
+    expect(japanese.romanize('宇多田ヒカル', song)).toBe('Utada Hikaru');
+    expect(japanese.romanize('巡音ルカ', song)).toBe('Megurine Luka');
+    expect(japanese.romanize('桜の花', song)).toBe('sakura no hana');
+  });
+
+  it('reads the voicebanks songs sing by their names, whatever the credits', () => {
+    expect(japanese.romanize('ワタシ重音')).toBe('watashi Kasane');
+    expect(japanese.romanize('初音ミク')).toBe('Hatsune miku');
+  });
+
   it('reads a katakana word no entry has as it is written', () => {
     expect(japanese.romanize('ズッキュンドッキュン')).toBe('zukkyundokkyun');
   });

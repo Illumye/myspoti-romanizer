@@ -17,6 +17,10 @@ romanization. A romanization the lyrics' source gives (Apple Music, NetEase) alw
 | Serbian    | Serbian Latin alphabet                                                       |
 | Macedonian | Official system (2008)                                                       |
 
+Japanese readings are guessed from context and can be wrong: songs often sing a kanji otherwise
+than it is usually read (運命, unmei, sung sadame), which only furigana tell and lyrics rarely carry,
+and a rare word or a name can get the wrong reading.
+
 What no engine reads stays as it is written in the romanized line: a kanji the Japanese lexicon has
 no reading for, a word in a script none romanizes (kimi to 龘 no uta). A line where that is more
 than a quarter of its letters gets no romanization: it would not help read it, and is likely in a
@@ -85,7 +89,8 @@ watashi, 明日 ashita, お母さん okāsan, 二つ futatsu, 三十路 misoji, 
 On 60 songs kept apart to stress it, the furthest from subtitles (rap and its slang: Zeebra,
 Creepy Nuts, RHYMESTER; Vocaloid wordplay: PinocchioP; classical Japanese: Wagakki Band), it reads
 98.4 % of the runs, 92.5 % as MeCab does: what it misses there is rare literary words (閻魔, 喧噪,
-俯瞰) more than slang.
+俯瞰) more than slang. MeCab is a reference here, not the truth: a reading only the song gives
+escapes it too.
 
 The model is rebuilt with Python, in `tools/japanese`. The corpus and the lyrics stay in
 `tools/japanese/data`, out of the repository: only word counts reach the model.

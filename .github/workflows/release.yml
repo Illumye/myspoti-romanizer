@@ -20,9 +20,9 @@ jobs:
       - run: npm run check
       - name: The tag is the package's version
         run: test "${GITHUB_REF_NAME#v}" = "$(node -p "require('./package.json').version")"
-      # extension.zip is what Myspoti installs from the repository's address; extension-hook.zip
-      # is for a Myspoti with the lyrics-romanize hook, installed from its own address.
+      # extension.zip is what Myspoti 2.4.0 or newer installs from the store or the repository's
+      # address; extension-compat.zip is for an older Myspoti, installed from its own address.
       - name: Publish the packages
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/extension.zip dist/extension-hook.zip --title "$GITHUB_REF_NAME" --generate-notes
+        run: gh release create "$GITHUB_REF_NAME" dist/extension.zip dist/extension-compat.zip --title "$GITHUB_REF_NAME" --generate-notes

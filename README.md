@@ -28,20 +28,22 @@ lyrics' own language first when their source gives it.
 
 Both carry the same id, so going from one to the other is an update.
 
-- **For a Myspoti with the `lyrics-romanize` hook** (`extension-hook.zip`), proposed upstream
-  ([kota-zo/myspoti#154](https://github.com/kota-zo/myspoti/issues/154)): Myspoti asks for the lines
-  any source left without a romanization, whatever that source, and nothing else is needed. This is
-  the one to use when your Myspoti has the hook.
-- **For Myspoti as it is** (`extension.zip`, the store's): Myspoti has no way yet to ask an
-  extension for romanizations alone, so this one answers the `lyrics` hook with the song's lyrics,
-  Spotify's own or LRCLIB's, each line also in Latin letters, and Myspoti keeps the romanizations
-  when it matches these lines to the lyrics it shows.
+- **For Myspoti 2.4.0 or newer** (`extension.zip`, the store's): Myspoti asks it, through the
+  `lyrics-romanize` hook ([kota-zo/myspoti#165](https://github.com/kota-zo/myspoti/pull/165)), for
+  the lines any source left without a romanization, whatever that source, and nothing else is
+  needed: no network, no access to Spotify.
+- **For an older Myspoti** (`extension-compat.zip`): it has no way to ask an extension for
+  romanizations alone, so this one answers the `lyrics` hook with the song's lyrics, Spotify's own
+  or LRCLIB's, each line also in Latin letters, and Myspoti keeps the romanizations when it matches
+  these lines to the lyrics it shows.
 
 Install: from Myspoti's store, or **Install from an address** with
-`https://github.com/Illumye/myspoti-romanizer` (the newest release's `extension.zip`); the hook
-variant with the address of the release's `extension-hook.zip`, or **Install from a file**.
+`https://github.com/Illumye/myspoti-romanizer`: Myspoti installs the newest release's
+`extension.zip` and keeps it up to date. An older Myspoti does not list it in its store: install
+the release's `extension-compat.zip` from its address or with **Install from a file**; Myspoti does
+not update a package installed that way.
 
-### What the variant for Myspoti as it is cannot do
+### What the variant for an older Myspoti cannot do
 
 It goes through a hook made to give lyrics, not to romanize the ones shown, so some songs keep their
 lines without a romanization where the hook variant gives one:
@@ -126,13 +128,15 @@ npm run check    # types, lint, unit tests, build into dist/
 MYSPOTI_EXT=/path/to/myspoti-ext npm run rhino    # the built packages in Myspoti's own runner
 ```
 
-`MYSPOTI_EXT` is the `myspoti-ext` launcher of a Myspoti build with the hook
+`MYSPOTI_EXT` is the `myspoti-ext` launcher of Myspoti 2.4.0 or newer
 (`base/extensions-cli/build/install/myspoti-ext/bin/myspoti-ext` after
 `./gradlew :extensions-cli:installDist`).
 
 A release is a tag `vX.Y.Z` matching `package.json`'s version: the Release workflow checks it,
-builds, and attaches `extension.zip` and `extension-hook.zip`. The repository's topic
-`myspoti-extension` lists it in Myspoti's store.
+builds, and attaches `extension.zip` and `extension-compat.zip`. The repository's topic
+`myspoti-extension` lists it in Myspoti's store. Before tagging, the `changelog` of
+`manifests/hook.json` says what the version changes: Myspoti shows it on the store page and before
+an update.
 
 ## License
 

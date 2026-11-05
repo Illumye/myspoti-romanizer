@@ -1,6 +1,6 @@
 // Runs each built package in Myspoti's desktop runner, on the Rhino the phone runs: a bundle must
-// load and answer there, not only in Node. MYSPOTI_EXT is the myspoti-ext launcher of a Myspoti
-// build that has the lyrics-romanize hook (base/extensions-cli/build/install/myspoti-ext/bin).
+// load and answer there, not only in Node. MYSPOTI_EXT is the myspoti-ext launcher of Myspoti
+// 2.4.0 or newer, which has the lyrics-romanize hook (base/extensions-cli/build/install/myspoti-ext/bin).
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,7 +10,7 @@ const VARIANTS = ['compat', 'hook'];
 
 const cli = process.env.MYSPOTI_EXT;
 if (!cli) {
-  console.error('Set MYSPOTI_EXT to the myspoti-ext launcher of a Myspoti build with the lyrics-romanize hook.');
+  console.error('Set MYSPOTI_EXT to the myspoti-ext launcher of Myspoti 2.4.0 or newer.');
   process.exit(2);
 }
 

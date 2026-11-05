@@ -5,6 +5,8 @@
   "description": "Writes lyrics in Japanese, Korean and Cyrillic scripts in Latin letters, offline, under each line of the songs whose lyrics come without a romanization.",
   "category": "lyrics",
   "tags": ["romanization", "romaji", "japanese", "korean", "cyrillic"],
+  "minAppVersion": "2.4.0",
+  "changelog": "Myspoti 2.4.0 asks extensions for the romanizations of the lyrics it shows: the extension now answers that way, for the lyrics of every source, Spotify's word-by-word lyrics included, with no network and no access to Spotify.",
   "actions": [
     {
       "name": "lyrics.romanize",

@@ -11,21 +11,12 @@
     "korean",
     "cyrillic"
   ],
+  "minAppVersion": "2.4.0",
+  "changelog": "Myspoti 2.4.0 asks extensions for the romanizations of the lyrics it shows: the extension now answers that way, for the lyrics of every source, Spotify's word-by-word lyrics included, with no network and no access to Spotify.",
   "actions": [
     {
-      "name": "lyrics.provide",
-      "why": "Gives the song's lyrics back with each line also in Latin letters"
-    },
-    {
-      "name": "spotify.catalog",
-      "why": "Reads Spotify's lyrics of the song, to romanize the very lines shown"
-    },
-    {
-      "name": "network",
-      "hosts": [
-        "lrclib.net"
-      ],
-      "why": "Reads the song's lyrics on lrclib.net when Spotify has none"
+      "name": "lyrics.romanize",
+      "why": "Writes Japanese, Korean and Cyrillic lyrics in Latin letters, offline"
     }
   ],
   "version": "0.3.0",

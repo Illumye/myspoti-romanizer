@@ -19,8 +19,10 @@ const VARIANTS = [
   { name: 'hook', entry: 'src/main.hook.ts', manifest: 'manifests/hook.json', zip: 'extension.zip', store: true },
   { name: 'compat', entry: 'src/main.compat.ts', manifest: 'manifests/compat.json', zip: 'extension-compat.zip' },
 ];
-// One date for every file of a package, so that the same sources give the same zip.
-const PACKAGE_DATE = new Date('2026-01-01T00:00:00Z');
+// One date for every file of a package, so that the same sources give the same zip. A zip keeps
+// a local date and time, without a time zone: built from local fields, it is the same wherever
+// the build runs.
+const PACKAGE_DATE = new Date(2026, 0, 1);
 
 const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
 const [major, minor, patch] = pkg.version.split('.').map(Number);
